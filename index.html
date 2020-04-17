@@ -1,0 +1,246 @@
+<html>
+    <head>
+        <style type="text/css">
+            #outputDiv canvas {
+                width: 100%;
+                height: 100%;
+            }
+            .container {
+                display: table;
+                width:100%;
+                height:100%
+            }
+            .container div {
+                display: table-row;
+            }
+
+            #dropNotification {
+                position: absolute;
+                top:100px;
+                left: 20px;
+                right:20px;
+                text-align:center;
+                pointer-events: none;
+            }
+
+            .boxed {
+                background-color: white;
+                box-shadow: 5px 5px 2px #999999;
+                border: 1px solid black;
+                border-radius: 10px;
+            }
+
+            #aboutBox {
+                position:absolute;
+                top:50px;
+                left: 25%;
+                width: 50%;
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+        </style>
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.js'></script>
+        <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.css'/>
+    </head>
+    <body>
+        <div id="aboutBox" class="boxed">
+<a href="https://github.com/MaPePeR/jsColorblindSimulator"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+<h1>jsColorblindSimulator</h1>
+<h2>Usage</h2>
+<p>Use the file selector in the top left, <strong>drag and drop</strong> or <strong>paste</strong> an image here to load it. You will then be able to choose between different simulations for different kinds of color-blindness.</p>
+<p>All processing is done locally in your web browser. The image will not leave your computer.</p>
+<p>The displayed image can be moved by clicking and dragging and zoomed by (shift-)double clicking or using the mouse wheel.</p>
+<p>The lens-feature allows you to see what the original image looked like in the region around your cursor. The inverse lens shows you the original image and the simulated image around your cursor.</p>
+
+<h2>Uses algorithms from </h2>
+<ul>
+    <li><a href="http://web.archive.org/web/20081014161121/http://www.colorjack.com/labs/colormatrix/" target="blank">http://www.colorjack.com/labs/colormatrix/</a> (web.archive link, because original source is gone)</li>
+    <li><a href="http://web.archive.org/web/20090318054431/http://www.nofunc.com/Color_Blindness_Library" target="blank">http://www.nofunc.com/Color_Blindness_Library</a> (web.archive link, because original source is gone)</li>
+</ul>
+<h3>No guarantees that these are actually good!</h3>
+<a href="http://kaioa.com/node/75#comment-247" target="blank">Comment</a> about the first algorithm:
+<blockquote>
+<p>You're right, the ColorMatrix version is very simplified, and not accurate. I created that color matrix one night (<a href="http://www.colorjack.com/labs/colormatrix/" target="blank">http://www.colorjack.com/labs/colormatrix/</a>) and since then it's shown up many places... I should probably take that page down before it spreads more! Anyways, it gives you an idea of what it might look like, but for the real thing...</p>
+<p>As far as a simple script to simulate color blindness, this one does the best job:</p>
+<p><a href="http://www.nofunc.com/Color_Blindness_Library/" target="blank">http://www.nofunc.com/Color_Blindness_Library/</a> - It uses "confusion lines" within the XYZ color space to calculate values (this one is in Javascript, and should be easy to convert to python).</p>
+<p>There are a few other methods, and no one really knows exactly what it would look like... these are all generalizations of a small sample, set against the masses.</p>
+</blockquote>
+
+Copyright Notice for the second non-commercial algorithm:
+<blockquote><pre>
+The Color Blind Simulation function is
+copyright (c) 2000-2001 by Matthew Wickline and the
+Human-Computer Interaction Resource Network ( http://hcirn.com/ ).
+
+It is used with the permission of Matthew Wickline and HCIRN,
+and is freely available for non-commercial use. For commercial use, please
+contact the Human-Computer Interaction Resource Network ( http://hcirn.com/ ).
+</pre></blockquote>
+        </div>
+        <div class="container" style="">
+            <div>
+                <input type="file" id="fileInput"/>
+<label><input type="radio" name="colorblindType" value="Normal" checked/>Normal</label>
+<label><input type="radio" name="colorblindType" value="Protanopia"/>Protanopia</label>
+<label><input type="radio" name="colorblindType" value="Protanomaly"/>Protanomaly</label>
+<label><input type="radio" name="colorblindType" value="Deuteranopia"/>Deuteranopia</label>
+<label><input type="radio" name="colorblindType" value="Deuteranomaly"/>Deuteranomaly</label>
+<label><input type="radio" name="colorblindType" value="Tritanopia"/>Tritanopia</label>
+<label><input type="radio" name="colorblindType" value="Tritanomaly"/>Tritanomaly</label>
+<label><input type="radio" name="colorblindType" value="Achromatopsia"/>Achromatopsia</label>
+<label><input type="radio" name="colorblindType" value="Achromatomaly"/>Achromatomaly</label>
+
+<label><input type="checkbox" name="hcirn" value="true" id="usehcirn">Use non-commercial-only algorithm</label>
+<br/>
+<label><input type="radio" name="lens" value="No" checked/>No Lens</label>
+<label><input type="radio" name="lens" value="Normal"/>Normal Lens</label>
+<label><input type="radio" name="lens" value="Inverse"/>Inverse Lens</label>
+&nbsp; <a href="#" onclick="panZoomImage.translateX=0;panZoomImage.translateY=0;panZoomImage.scale=1;panZoomImage.redraw();">Reset View</a>
+&nbsp; <a href="#" target="blank" id="imageLink" style="display: none">Open simulated image in new window</a>
+<span id="loadingIndicator" style="display:none">&nbsp;Computing...</span>
+            </div>
+            <div>
+                <hr/>
+            </div>
+            <div style="height: 100%" id="canvasDiv">
+                <div id="dropNotification" class="boxed" style="display: none"><h1>Drop your image to load it</h1></div>
+                <canvas id="outCanvas">Your Browser does not support &lt;canvas&gt;. Get an upgrade!</canvas>
+            </div>
+        </div>
+        <script src="panZoomImage.js"></script>
+        <script src="hcirn_colorblind_simulation.js"></script>
+        <script src="colorblind.js"></script>
+        <script type="text/javascript">
+
+var loadingIndicator = document.getElementById('loadingIndicator');
+function filterOrImageChanged() {
+    var type = document.querySelector('input[name = "colorblindType"]:checked').value;
+    var usehcirn = document.getElementById("usehcirn").checked;
+    var filterName = (usehcirn ? "hcirn" : "simpl") + type;
+    console.log("filterOrImageChanged: " + filterName);
+
+    document.getElementById('imageLink').style.display = type === "Normal" ? "none" : "inline";
+
+    if (currentImage) {
+        loadingIndicator.style.display="inline";
+        NProgress.set(0.2);
+        setTimeout(function () {
+            getFilteredImage(currentImage, filterName, function (filteredImage, url) {
+                document.getElementById('imageLink').href = url;
+                panZoomImage.displayImage(filteredImage);
+                NProgress.done();
+                loadingIndicator.style.display="none";
+            });
+        }, 0);
+    }
+}
+
+function lensChanged() {
+    var v = document.querySelector('input[name = "lens"]:checked').value;
+    if (v === "No") {
+        panZoomImage.lens = 0;
+    } else if (v === "Normal") {
+        panZoomImage.lens = 1;
+    } else if (v === "Inverse") {
+        panZoomImage.lens = 2;
+    } else {
+        throw "Illegal Lens Type";
+    }
+    panZoomImage.redraw();
+}
+(function() {
+    var radios = document.querySelectorAll('input[name = "colorblindType"]');
+    var i;
+    for (i = 0; i < radios.length; i++) {
+        radios[i].onclick = filterOrImageChanged;
+    }
+    radios = document.querySelectorAll('input[name = "lens"]');
+    for (i = 0; i < radios.length; i++) {
+        radios[i].onclick = lensChanged;
+    }
+    document.getElementById("usehcirn").onclick = filterOrImageChanged;
+})();
+
+//Based on http://stackoverflow.com/a/3814285/2256700
+var fileInput = document.getElementById('fileInput');
+var currentImage;
+fileInput.onchange = function (evt) {
+    var tgt = evt.target || window.event.srcElement,
+        files = tgt.files;
+    readFile(files);
+};
+
+function readFile(files) {
+    document.getElementById("aboutBox").style.display = "none";
+    // FileReader support
+    if (FileReader && files && files.length) {
+        if (files.length !== 1) {
+            alert("Can only show one file at a time");
+            return;
+        }
+        if (!files[0].type.match('image.*')) {
+            alert("Was not an image file. :(");
+            return;
+        }
+        NProgress.set(0.0);
+        var fr = new FileReader();
+        fr.onload = function () {
+            var img = new Image();
+            img.onload = function () {
+                //createFilteredImage(this);
+                currentImage = this;
+                panZoomImage.setHiddenLensImage(currentImage);
+                clearImageCache();
+                filterOrImageChanged();
+            };
+            img.src = fr.result;
+        };
+        fr.readAsDataURL(files[0]);
+    }
+    // Not supported
+    else {
+        alert("Your Browser does not support the required Features.");
+    }
+}
+var canvasDiv = document.getElementById("canvasDiv");
+var dropNotification = document.getElementById("dropNotification");
+// Based on http://www.html5rocks.com/en/tutorials/file/dndfiles/
+canvasDiv.addEventListener('drop', function (evt) {
+    evt.stopPropagation();
+    evt.preventDefault();
+
+    dropNotification.style.display = "none";
+    readFile(evt.dataTransfer.files);
+}, false);
+
+canvasDiv.addEventListener('dragover', function (evt) {
+    document.getElementById("aboutBox").style.display = "none";
+    evt.stopPropagation();
+    evt.preventDefault();
+    dropNotification.style.display = "block";
+    evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
+}, false);
+
+canvasDiv.addEventListener('dragleave', function (evt) {
+    dropNotification.style.display = "none";
+}, false);
+
+//Retrieve Image from Clipboard: http://stackoverflow.com/a/15369753/2256700
+document.onpaste = function (event) {
+    // use event.originalEvent.clipboard for newer chrome versions
+    var items = (event.clipboardData  || event.originalEvent.clipboardData).items;
+    // find pasted image among pasted items
+    var blob = null;
+    for (var i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf("image") === 0) {
+            blob = items[i].getAsFile();
+        }
+    }
+    // load image if there is a pasted image
+    if (blob !== null) {
+        readFile([blob]);
+    }
+};
+        </script>
+    </body>
+</html>
