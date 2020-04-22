@@ -145,9 +145,10 @@ function createFilteredImage(img, type, callback) {
 
 function getFilterFunction(type) {
     var lib;
-    if (type.substring(0, 5) === 'hcirn') {
-        lib = fBlind;
-    } else if (type.substring(0, 5) === 'simpl') {
+    // if (type.substring(0, 5) === 'hcirn') {
+    //     lib = fBlind;
+    // } else 
+    if (type.substring(0, 5) === 'simpl') {
         lib = colorMatrixFilterFunctions;
     } else {
         throw 'Invalid Filter Type!';
